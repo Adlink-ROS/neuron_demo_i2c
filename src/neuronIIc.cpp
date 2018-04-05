@@ -108,18 +108,21 @@ void NeuronIIc::ReadLevel(uint32_t& level)
 }
 
 
-void NeuronIIc::ReadI2C()
+void NeuronIIc::ReadI2C(int16_t &data, unsigned int bfr_size)
 {
 	// For MPU 6050
 	// https://www.i2cdevlib.com/devices/mpu6050#registers
 	uint32_t ret = 0;
 	uint8_t addr = EAPI_I2C_ENC_7BIT_ADDR(0x68);
-	int16_t data[7];
+	if( sizeof(data) != bfr_size) {
+		printf("Error data size not match");
+		return;
+	}
     ret = SemaEApiI2CReadTransfer(libHandle_, EAPI_ID_I2C_EXTERNAL, addr,
 									0x3B , 			// I2C Command/Offset, starting with register 0x3B (ACCEL_XOUT_H)
 									data , 			// void *pBuffer, Transfer Data pBuffer
 									sizeof(data), 	// uint32_t	BufLen, Data pBuffer Length
-									14*4)			// uint32_t	ByteCnt, Byte Count to read
+									7*2)			// uint32_t	ByteCnt, Byte Count to read
 	if (ret != EAPI_STATUS_SUCCESS) 
     {
         printf("Error Reading IIc: 0x%X\n\n", ret);

@@ -31,7 +31,7 @@ class NeuronIIc
 		void SetDir(uint32_t dir);
 		void SetLevel(uint32_t level);
 		void ReadLevel(uint32_t& level);
-		void NeuronIIc::ReadI2C()
+		ReadI2C(int16_t &data, unsigned int bfr_size);
 
         explicit NeuronIIc(uint32_t pin) : pin_(pin) {};
         virtual ~NeuronIIc() {};

@@ -51,10 +51,20 @@
 	//printf("<<<= send to ------- Topic <\"%s\">: \"%s\".\n", TOPIC_DATA, msg->data.c_str());
 	
 	
+	int16_t data[7], tmp;
+	gpio_->ReadI2C(data, 7);
 	
 	sensor_msgs::msg::Imu imu;
-	imu.angular_velocity = 
-	imu.linear_accleeration = 
+	imu.linear_accleeration.x = data[0];
+	imu.linear_accleeration.y = data[1];
+	imu.linear_accleeration.z = data[2];
+	tmp = data[3];
+	imu.angular_velocity.x = data[4];
+	imu.angular_velocity.y = data[5];
+	imu.angular_velocity.z = data[6];
+	printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", data[0], data[1], data[2])
+	printf("MPU6050 rotation x:%d, y:%d, z:%d", data[3], data[4], data[5])
+	printf("at temperature: %f", tmp/340.00+36.53);
     
     publisher_->publish(imu);    
     return;
