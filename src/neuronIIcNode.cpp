@@ -49,24 +49,33 @@
 	*/
 	//msg->data = stmp;
 	//printf("<<<= send to ------- Topic <\"%s\">: \"%s\".\n", TOPIC_DATA, msg->data.c_str());
-	
+	publisher_->publish(msg);
 	
 	int16_t data[7], tmp;
-	gpio_->ReadI2C(data, 7);
-	
-	sensor_msgs::msg::Imu imu;
-	imu.linear_accleeration.x = data[0];
-	imu.linear_accleeration.y = data[1];
-	imu.linear_accleeration.z = data[2];
+    gpio_->WakeUp6050();
+	gpio_->ReadI2C(data, 14);
+	//sensor_msgs::msg::Imu imu;
+   // auto imu_msg = std::make_shared<sensor_msgs::msg::Imu>();
+    
+	/*imu.linear_acceleration.x = data[0];
+	imu.linear_acceleration.y = data[1];
+	imu.linear_acceleration.z = data[2];
 	tmp = data[3];
 	imu.angular_velocity.x = data[4];
 	imu.angular_velocity.y = data[5];
 	imu.angular_velocity.z = data[6];
-	printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", data[0], data[1], data[2])
-	printf("MPU6050 rotation x:%d, y:%d, z:%d", data[3], data[4], data[5])
-	printf("at temperature: %f", tmp/340.00+36.53);
+    *//*
+    imu_msg->linear_acceleration.y = data[1];
+	imu_msg->linear_acceleration.z = data[2];
+	tmp = data[3];
+	imu_msg->angular_velocity.x = data[4];
+	imu_msg->angular_velocity.y = data[5];
+	imu_msg->angular_velocity.z = data[6];*/
+	printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", data[0], data[1], data[2]);
+	printf("MPU6050 rotation x:%d, y:%d, z:%d\n", data[3], data[4], data[5]);
+	printf("at temperature: %f\n", data[3]/340.00+36.53);
     
-    publisher_->publish(imu);    
+    //publisher_->publish(imu_msg);
     return;
 }
 
@@ -76,7 +85,9 @@
  * * * * * * * * * */
 NeuronIIcNode::NeuronIIcNode() : Node("neuron_gpio")
 {
-    publisher_ = this->create_publisher<sensor_msgs::msg::Imu>(
+    /*publisher_ = this->create_publisher<sensor_msgs::msg::Imu>(
+            TOPIC_DATA, rmw_qos_profile_sensor_data);*/
+    publisher_ = this->create_publisher<std_msgs::msg::String>(
             TOPIC_DATA, rmw_qos_profile_sensor_data);
 
     subscription_ = this->create_subscription<std_msgs::msg::String>(

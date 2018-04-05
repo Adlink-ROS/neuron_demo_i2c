@@ -18,12 +18,12 @@
 #include <memory>
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "sensor_msgs/msg/Imu.hpp"
+#include "sensor_msgs/msg/imu.hpp"
 #include "neuronIIc.hpp"
 
 /*  Topic Name Settings */
 #define TOPIC_CMD "neuron_gpio_cmd"
-#define TOPIC_DATA "neuron_gpio_data"
+#define TOPIC_DATA "neuron_i2c_data"
 
 /* GPIO Settings */
 #define GPIO_TOGGLE_PIN (9)
@@ -39,9 +39,10 @@ class NeuronIIcNode : public rclcpp::Node
 
   private:
     void topic_callback(const std_msgs::msg::String::SharedPtr msg);
+    //rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr publisher_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
-    std::shared_ptr<NeuronGpio> gpio_;
+    std::shared_ptr<NeuronIIc> gpio_;
 };
 
 

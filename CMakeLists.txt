@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(neuron_demo_iic)
+project(neuron_demo_i2c)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -31,12 +31,12 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 
 # Source Code
-add_executable(neuron_demo_iic src/main.cpp src/neuronIIc.cpp src/neuronIIcNode.cpp)
-target_link_libraries(neuron_demo_iic semaeapi)
-ament_target_dependencies(neuron_demo_iic rclcpp std_msgs)
+add_executable(neuron_demo_i2c src/main.cpp src/neuronIIc.cpp src/neuronIIcNode.cpp)
+target_link_libraries(neuron_demo_i2c semaeapi)
+ament_target_dependencies(neuron_demo_i2c rclcpp std_msgs)
 
 install(TARGETS 
-neuron_demo_iic
+neuron_demo_i2c
     DESTINATION lib/${PROJECT_NAME}
 )
 

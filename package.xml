@@ -1,18 +1,20 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>neuron_demo_gpio</name>
-    <version>0.0.1</version>
-    <description>A demo of setting the high/low of Neuron's GPIO10</description>
-    <maintainer email="alan.chen@adlinktech.com">Alan Chen</maintainer>
+    <name>neuron_demo_i2c</name>
+    <version>0.0.2</version>
+    <description>A demo of setting the high/low of Neuron's GPIO10 and I2C function </description>
+    <maintainer email="f039281310@yahoo.com.tw">wing Kang</maintainer>
     <license>Apache License 2.0</license>
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 
     <build_depend>rclcpp</build_depend>
     <build_depend>std_msgs</build_depend>
+    <build_depend>sensor_msgs</build_depend>
 
     <exec_depend>rclcpp</exec_depend>
     <exec_depend>std_msgs</exec_depend>
+    <exec_depend>sensor_msgs</exec_depend>
 
     <export>
         <build_type>ament_cmake</build_type>

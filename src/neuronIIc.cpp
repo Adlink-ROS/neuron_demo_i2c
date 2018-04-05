@@ -23,6 +23,8 @@ bool NeuronIIc::isAvailable_ = false;
 
 uint32_t NeuronIIc::libHandle_ = 0;
 
+bool NeuronIIc::first_time = true;
+
 /* * * * * * * * * * * * * 
  * Static Public Methods *
  * * * * * * * * * * * * */
@@ -108,23 +110,42 @@ void NeuronIIc::ReadLevel(uint32_t& level)
 }
 
 
-void NeuronIIc::ReadI2C(int16_t &data, unsigned int bfr_size)
+void NeuronIIc::ReadI2C(int16_t *data_ptr, unsigned int bfr_size)
 {
 	// For MPU 6050
 	// https://www.i2cdevlib.com/devices/mpu6050#registers
 	uint32_t ret = 0;
 	uint8_t addr = EAPI_I2C_ENC_7BIT_ADDR(0x68);
-	if( sizeof(data) != bfr_size) {
+	/*if( sizeof(data_ptr) != bfr_size) {
 		printf("Error data size not match");
 		return;
-	}
-    ret = SemaEApiI2CReadTransfer(libHandle_, EAPI_ID_I2C_EXTERNAL, addr,
-									0x3B , 			// I2C Command/Offset, starting with register 0x3B (ACCEL_XOUT_H)
-									data , 			// void *pBuffer, Transfer Data pBuffer
-									sizeof(data), 	// uint32_t	BufLen, Data pBuffer Length
-									7*2)			// uint32_t	ByteCnt, Byte Count to read
+	}*/
+    ret = SemaEApiI2CReadTransfer(libHandle_, 
+                                  EAPI_ID_I2C_EXTERNAL, 
+                                  addr,
+                                  0x3B , 		// I2C Command/Offset, starting with register 0x3B (ACCEL_XOUT_H)
+                                  data_ptr , 		// void *pBuffer, Transfer Data pBuffer
+								  bfr_size, // uint32_t	BufLen, Data pBuffer Length
+								  7*2);			// uint32_t	ByteCnt, Byte Count to read
 	if (ret != EAPI_STATUS_SUCCESS) 
     {
         printf("Error Reading IIc: 0x%X\n\n", ret);
     }
+}
+
+void NeuronIIc::WakeUp6050()
+{
+    uint8_t addr = EAPI_I2C_ENC_7BIT_ADDR(0x68);
+    uint8_t cmd = 0x00;
+    if(first_time){
+        SemaEApiI2CWriteTransfer(libHandle_,
+                                 EAPI_ID_I2C_EXTERNAL,
+                                 addr,
+                                 0x6B,
+                                 &cmd,
+                                 1);
+    }
+    
+    first_time = false;
+    return;
 }
