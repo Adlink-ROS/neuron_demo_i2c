@@ -181,4 +181,4 @@ build/Testing/Temporary/LastTest.log
 lib/libEApi_1.so.3
 lib/libsema.so.3
 lib/libsemaeapi.so
-.nppws
+*.nppws
