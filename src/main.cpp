@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "neuronHwmNode.hpp"
+#include "neuronIIcNode.hpp"
 
 
 /*
- *  In this DEMO, the NeuronHwmNode subscribes the TOPIC_CMD topic.
+ *  In this DEMO, the NeuronGpioNode subscribes the TOPIC_CMD topic.
  *  ANY kind of std_msgs data from TOPIC_CMD will trigger the node to
- *  publish the next hardware monitor data to TOPOC_DATA topic.
+ *  toggle the GPIO PIN10 and publish the GPIO HIGH/LOW to TOPOC_DATA topic.
  * 
  *  The setting of TOPIC_CMD and TOPIC_DATA can be found in reuronHwmNode.hpp
 */
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<NeuronHwmNode>());
+    rclcpp::spin(std::make_shared<NeuronGpioNode>());
     rclcpp::shutdown();
     return 0;
 }

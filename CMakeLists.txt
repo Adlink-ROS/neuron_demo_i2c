@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(neuron_demo_hwm)
+project(neuron_demo_iic)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -14,7 +14,7 @@ endif()
 #set(CMAKE_BUILD_TYPE Debug)
 
 # Add include directories
-include_directories(${CMAKE_SOURCE_DIR}/include/neuron_demo_hwm ${CMAKE_SOURCE_DIR}/include/SEMA)
+include_directories(${CMAKE_SOURCE_DIR}/include/neuron_demo_iic ${CMAKE_SOURCE_DIR}/include/SEMA)
 
 # Set link directories
 link_directories(${CMAKE_SOURCE_DIR}/lib)
@@ -31,12 +31,12 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 
 # Source Code
-add_executable(neuron_demo_hwm src/main.cpp src/neuronHwm.cpp src/neuronHwmNode.cpp)
-target_link_libraries(neuron_demo_hwm semaeapi)
-ament_target_dependencies(neuron_demo_hwm rclcpp std_msgs)
+add_executable(neuron_demo_iic src/main.cpp src/neuronIIc.cpp src/neuronIIcNode.cpp)
+target_link_libraries(neuron_demo_iic semaeapi)
+ament_target_dependencies(neuron_demo_iic rclcpp std_msgs)
 
 install(TARGETS 
-neuron_demo_hwm
+neuron_demo_iic
     DESTINATION lib/${PROJECT_NAME}
 )
 

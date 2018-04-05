@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>neuron_demo_hwm</name>
+    <name>neuron_demo_gpio</name>
     <version>0.0.1</version>
-    <description>A demo of reading the Neuron's hardware monitor information</description>
+    <description>A demo of setting the high/low of Neuron's GPIO10</description>
     <maintainer email="alan.chen@adlinktech.com">Alan Chen</maintainer>
     <license>Apache License 2.0</license>
 
