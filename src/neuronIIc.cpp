@@ -110,7 +110,7 @@ void NeuronIIc::ReadLevel(uint32_t& level)
 }
 
 
-void NeuronIIc::ReadI2C(int16_t *data_ptr, unsigned int bfr_size)
+void NeuronIIc::ReadI2C(uint8_t *data_ptr, unsigned int bfr_size)
 {
 	// For MPU 6050
 	// https://www.i2cdevlib.com/devices/mpu6050#registers
@@ -136,15 +136,21 @@ void NeuronIIc::ReadI2C(int16_t *data_ptr, unsigned int bfr_size)
 void NeuronIIc::WakeUp6050()
 {
     uint8_t addr = EAPI_I2C_ENC_7BIT_ADDR(0x68);
-    uint8_t cmd = 0x00;
+    uint8_t cmd = 0x00; // |reset|sleep|cycle|RSV|temp_dis|clk_sel*2|
     if(first_time){
-        SemaEApiI2CWriteTransfer(libHandle_,
+        /*SemaEApiI2CWriteTransfer(libHandle_,
                                  EAPI_ID_I2C_EXTERNAL,
                                  addr,
                                  0x6B,
                                  &cmd,
-                                 1);
+                                 1);*/
     }
+    SemaEApiI2CWriteTransfer(libHandle_,
+                             EAPI_ID_I2C_EXTERNAL,
+                             addr,
+                             0x6B,
+                             &cmd,
+                             1);
     
     first_time = false;
     return;

@@ -23,8 +23,7 @@
 {
     // Print the received message
     printf("------------------------------------------------------------------\n");
-    printf("=>>> receive from -- Topic <\"%s\">: \"%s\".\n", TOPIC_CMD, msg->data.c_str());
-    printf("\n");
+    printf("Topic \"%s\" called: \"%s\".\n", TOPIC_CMD, msg->data.c_str());
 
     // Check the availability of the SEMA library 
     if (NeuronIIc::IsAvailable() == false || gpio_ == NULL)
@@ -51,30 +50,40 @@
 	//printf("<<<= send to ------- Topic <\"%s\">: \"%s\".\n", TOPIC_DATA, msg->data.c_str());
 	publisher_->publish(msg);
 	
-	int16_t data[7], tmp;
+	uint8_t data[14];
     gpio_->WakeUp6050();
 	gpio_->ReadI2C(data, 14);
-	//sensor_msgs::msg::Imu imu;
-   // auto imu_msg = std::make_shared<sensor_msgs::msg::Imu>();
     
-	/*imu.linear_acceleration.x = data[0];
+    //==== IMU msg is currently unavailable under ROS2 ====//
+    /* method 1
+    sensor_msgs::msg::Imu imu;
+	imu.linear_acceleration.x = data[0];
 	imu.linear_acceleration.y = data[1];
 	imu.linear_acceleration.z = data[2];
-	tmp = data[3];
 	imu.angular_velocity.x = data[4];
 	imu.angular_velocity.y = data[5];
-	imu.angular_velocity.z = data[6];
-    *//*
+	imu.angular_velocity.z = data[6];*/
+    
+    /* method 2
+    auto imu_msg = std::make_shared<sensor_msgs::msg::Imu>();
     imu_msg->linear_acceleration.y = data[1];
 	imu_msg->linear_acceleration.z = data[2];
 	tmp = data[3];
 	imu_msg->angular_velocity.x = data[4];
 	imu_msg->angular_velocity.y = data[5];
 	imu_msg->angular_velocity.z = data[6];*/
-	printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", data[0], data[1], data[2]);
-	printf("MPU6050 rotation x:%d, y:%d, z:%d\n", data[3], data[4], data[5]);
-	printf("at temperature: %f\n", data[3]/340.00+36.53);
-    
+	
+	int16_t acX = data[0]<<8|data[1];
+	int16_t acY = data[2]<<8|data[3];
+    int16_t acZ = data[4]<<8|data[5];
+    int16_t tmp = data[6]<<8|data[7];
+    int16_t gyX = data[8]<<8|data[9];
+    int16_t gyY = data[10]<<8|data[11];
+    int16_t gyZ = data[12]<<8|data[13];
+    	
+    printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", acX, acY, acZ);
+	printf("MPU6050 rotation x:%d, y:%d, z:%d\n", gyX, gyY, gyZ);
+	printf("at temperature: %f\n", tmp/340.00+36.53);
     //publisher_->publish(imu_msg);
     return;
 }
@@ -85,8 +94,10 @@
  * * * * * * * * * */
 NeuronIIcNode::NeuronIIcNode() : Node("neuron_gpio")
 {
+    //==== IMU msg is currently unavailable under ROS2 ====//
     /*publisher_ = this->create_publisher<sensor_msgs::msg::Imu>(
             TOPIC_DATA, rmw_qos_profile_sensor_data);*/
+    
     publisher_ = this->create_publisher<std_msgs::msg::String>(
             TOPIC_DATA, rmw_qos_profile_sensor_data);
 
