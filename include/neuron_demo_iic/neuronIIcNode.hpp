@@ -39,7 +39,10 @@ class NeuronIIcNode : public rclcpp::Node
 
   private:
     void topic_callback(const std_msgs::msg::String::SharedPtr msg);
+    
+    //==== IMU msg is currently unavailable under ROS2 ====//
     //rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr publisher_;
+    
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
     std::shared_ptr<NeuronIIc> gpio_;
