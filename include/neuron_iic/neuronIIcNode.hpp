@@ -26,7 +26,7 @@
 #define TOPIC_CMD "neuron_gpio_cmd"
 
 /* GPIO Settings */
-#define GPIO_TOGGLE_PIN (9)
+#define I2C_IMU_ADDR_ (0x68)
 
 
 using std::placeholders::_1;
@@ -44,7 +44,7 @@ class NeuronIIcNode : public rclcpp::Node
     rclcpp::Publisher<sensor_msgs::msg::Temperature>::SharedPtr publisher_tmp_;
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
-    std::shared_ptr<NeuronIIc> gpio_;
+    std::shared_ptr<NeuronIIc> imu_;
     std::shared_ptr<sensor_msgs::msg::Imu> imu_msg_;
     std::shared_ptr<sensor_msgs::msg::Temperature> tmp_msg_;
 

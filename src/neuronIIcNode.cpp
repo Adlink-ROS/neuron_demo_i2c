@@ -26,7 +26,7 @@
     printf("Topic \"%s\" called: \"%s\".\n", TOPIC_CMD, msg->data.c_str());
 
     // Check the availability of the SEMA library 
-    if (NeuronIIc::IsAvailable() == false || gpio_ == NULL)
+    if (NeuronIIc::IsAvailable() == false || imu_ == NULL)
     {
         printf("[ERROR] NeuronIIcNode - SEMA Lib not found.\n");
         return;
@@ -35,8 +35,8 @@
 	// For MPU 6050 registers, see:
 	// https://www.i2cdevlib.com/devices/mpu6050#registers
 	std::vector<uint8_t> data(14);
-    gpio_->WakeUp6050();
-	gpio_->ReadI2C(0x3B, data, 14);
+    imu_->WakeUp6050();
+	imu_->ReadI2C(0x3B, data, 14);
     
 	int16_t ac_x = data[0]<<8|data[1];
 	int16_t ac_y = data[2]<<8|data[3];
@@ -84,7 +84,7 @@ NeuronIIcNode::NeuronIIcNode() : Node("neuron_gpio")
             rmw_qos_profile_sensor_data);
         
     NeuronIIc::InitLib();
-    gpio_ = NeuronIIc::IsAvailable()? std::make_shared<NeuronIIc>(GPIO_TOGGLE_PIN) : NULL;
+    imu_ = NeuronIIc::IsAvailable()? std::make_shared<NeuronIIc>(I2C_IMU_ADDR_) : NULL;
     
     imu_msg_ = std::make_shared<sensor_msgs::msg::Imu>();
     imu_msg_ -> header.frame_id = "imu";

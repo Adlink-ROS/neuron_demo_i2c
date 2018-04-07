@@ -68,51 +68,10 @@ void NeuronIIc::UnInitLib()
 /* * * * * * * * * * * * * 
  *    Public Methods     *
  * * * * * * * * * * * * */
- /*
-void NeuronIIc::SetDir(uint32_t dir)
-{
-    uint32_t dirCheck = 0, ret = 0;
-	
-    ret = SemaEApiGPIOGetDirection(libHandle_, EAPI_GPIO_GPIO_ID(pin_), 0x01, &dirCheck);
-    if (ret != EAPI_STATUS_SUCCESS) 
-    {
-        printf("Error checking GPIO direction: 0x%X\n\n", ret);
-    }
-
-    if (dirCheck != dir)
-    {
-        ret = SemaEApiGPIOSetDirection(libHandle_, EAPI_GPIO_GPIO_ID(pin_), 0x01, dir);
-        if (ret != EAPI_STATUS_SUCCESS) 
-        {
-            printf("Error setting GPIO direction: 0x%X\n", ret);
-        }
-    }
-}
 
 
-void NeuronIIc::SetLevel(uint32_t level)
-{
-    uint32_t ret = 0;
-    ret = SemaEApiGPIOSetLevel(libHandle_, EAPI_GPIO_GPIO_ID(pin_), 0x01, level);
-    if (ret != EAPI_STATUS_SUCCESS)
-    {
-        printf("(Error setting GPIO level: 0x%X)\n", ret);
-    }
-}
 
-
-void NeuronIIc::ReadLevel(uint32_t& level)
-{																				
-    uint32_t ret = 0;
-    ret = SemaEApiGPIOGetLevel(libHandle_, EAPI_GPIO_GPIO_ID(pin_), 0x01, &level);
-    if (ret != EAPI_STATUS_SUCCESS) 
-    {
-        printf("Error getting GPIO level: 0x%X\n\n", ret);
-    }
-}*/
-
-
-void NeuronIIc::ReadI2C(const uint8_t cmd, std::vector<uint8_t> &data),const uint32_t byte_cnt)
+void NeuronIIc::ReadI2C(const uint8_t &cmd, std::vector<uint8_t> &data, const uint32_t &byte_cnt)
 {
 	uint32_t data_size = data.size() * sizeof(uint8_t);
 	if(byte_cnt > data_size)
@@ -136,7 +95,7 @@ void NeuronIIc::ReadI2C(const uint8_t cmd, std::vector<uint8_t> &data),const uin
 }
 
 
-void NeuronIIc::WriteI2C(const uint8_t &cmd, const std::vector<uint8_t> &data), const uint32_t byte_cnt)
+void NeuronIIc::WriteI2C(const uint8_t &cmd, std::vector<uint8_t> &data, const uint32_t &byte_cnt)
 {
 	uint32_t data_size = data.size() * sizeof(uint8_t);
 	if(byte_cnt > data_size)
@@ -163,12 +122,12 @@ void NeuronIIc::WriteI2C(const uint8_t &cmd, const std::vector<uint8_t> &data), 
 
 void NeuronIIc::WakeUp6050()
 {
-    //uint8_t cmd = 0x00; // |reset|sleep|cycle|RSV|temp_dis|clk_sel*2|
     if(first_time_)
 	{
    
     }
-	WriteI2C(0x6B, std::vector<uint8_t>(0x00), 1)
+    std::vector<uint8_t> data(1, 0x00); // |reset|sleep|cycle|RSV|temp_dis|clk_sel*2|
+	WriteI2C(0x6B, data, 1);
     first_time_ = false;
     return;
 }

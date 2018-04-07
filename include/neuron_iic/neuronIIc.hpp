@@ -33,8 +33,8 @@ class NeuronIIc
 		//void SetLevel(uint32_t level);
 		//void ReadLevel(uint32_t& level);
 
-		void ReadI2C(const uint8_t cmd, std::vector<uint8_t> &data),const uint32_t byte_cnt);
-		void WriteI2C(const uint8_t cmd, const std::vector<uint8_t> &data), const uint32_t byte_cnt);
+		void ReadI2C(const uint8_t &cmd, std::vector<uint8_t> &data, const uint32_t &byte_cnt);
+		void WriteI2C(const uint8_t &cmd, std::vector<uint8_t> &data, const uint32_t &byte_cnt);
         void WakeUp6050();
 
         explicit NeuronIIc(uint8_t addr) : addr_(EAPI_I2C_ENC_7BIT_ADDR(addr)) {};
