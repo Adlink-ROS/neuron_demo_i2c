@@ -1,5 +1,5 @@
-// Copyright 2017 ADLINK Technology, Inc.
-// Developer: Alan Chen (alan.chen@adlinktech.com)
+// Copyright 2018 ADLINK Technology, Inc.
+// Developer: Ewing Kang (f039281310@yahoo.com.tw)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,60 +31,38 @@
         printf("[ERROR] NeuronIIcNode - SEMA Lib not found.\n");
         return;
     }
-	/*
-    // Toggle GPIO Level
-    uint32_t level = 0;
-    gpio_->SetDir(EAPI_GPIO_OUTPUT);
-    gpio_->ReadLevel(level);
-    //level = (level == EAPI_GPIO_LOW);
-    gpio_->SetLevel(!!!level);
-
-    // Send it out
-    std::string stmp;
-    stmp += "The GPIO Pin";
-    stmp += std::to_string(GPIO_TOGGLE_PIN);
-    stmp += " is set to ";
-    stmp += level? "HIGH" : "LOW";
-	*/
-	//msg->data = stmp;
-	//printf("<<<= send to ------- Topic <\"%s\">: \"%s\".\n", TOPIC_DATA, msg->data.c_str());
-	publisher_->publish(msg);
 	
 	uint8_t data[14];
     gpio_->WakeUp6050();
 	gpio_->ReadI2C(data, 14);
     
-    //==== IMU msg is currently unavailable under ROS2 ====//
-    /* method 1
-    sensor_msgs::msg::Imu imu;
-	imu.linear_acceleration.x = data[0];
-	imu.linear_acceleration.y = data[1];
-	imu.linear_acceleration.z = data[2];
-	imu.angular_velocity.x = data[4];
-	imu.angular_velocity.y = data[5];
-	imu.angular_velocity.z = data[6];*/
+	int16_t ac_x = data[0]<<8|data[1];
+	int16_t ac_y = data[2]<<8|data[3];
+    int16_t ac_z = data[4]<<8|data[5];
+    int16_t temp_16 = data[6]<<8|data[7];
+    int16_t gy_x = data[8]<<8|data[9];
+    int16_t gy_y = data[10]<<8|data[11];
+    int16_t gy_z = data[12]<<8|data[13];
+    float temp_c = (temp_16/340.00+36.53);
+    printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", ac_x, ac_y, ac_z);
+	printf("MPU6050 rotation x:%d, y:%d, z:%d\n", gy_x, gy_y, gy_z);
+	printf("at temperature: %f\n", temp_c);
     
-    /* method 2
-    auto imu_msg = std::make_shared<sensor_msgs::msg::Imu>();
-    imu_msg->linear_acceleration.y = data[1];
-	imu_msg->linear_acceleration.z = data[2];
-	tmp = data[3];
-	imu_msg->angular_velocity.x = data[4];
-	imu_msg->angular_velocity.y = data[5];
-	imu_msg->angular_velocity.z = data[6];*/
-	
-	int16_t acX = data[0]<<8|data[1];
-	int16_t acY = data[2]<<8|data[3];
-    int16_t acZ = data[4]<<8|data[5];
-    int16_t tmp = data[6]<<8|data[7];
-    int16_t gyX = data[8]<<8|data[9];
-    int16_t gyY = data[10]<<8|data[11];
-    int16_t gyZ = data[12]<<8|data[13];
-    	
-    printf("MPU6050 acceleration x:%d, y:%d, z:%d\n", acX, acY, acZ);
-	printf("MPU6050 rotation x:%d, y:%d, z:%d\n", gyX, gyY, gyZ);
-	printf("at temperature: %f\n", tmp/340.00+36.53);
-    //publisher_->publish(imu_msg);
+    imu_msg_->linear_acceleration.x = ac_x;
+	imu_msg_->linear_acceleration.y = ac_y;
+    imu_msg_->linear_acceleration.z = ac_z;
+	imu_msg_->angular_velocity.x = gy_x;
+	imu_msg_->angular_velocity.y = gy_y;
+	imu_msg_->angular_velocity.z = gy_z;
+    tmp_msg_-> temperature = temp_c;
+    
+    rclcpp::Clock ros_clock;
+    rclcpp::Time now = ros_clock.now();
+    imu_msg_->header.stamp = now;
+    tmp_msg_->header.stamp = now;
+    publisher_imu_->publish(imu_msg_);
+    publisher_tmp_->publish(tmp_msg_);
+    
     return;
 }
 
@@ -94,20 +72,23 @@
  * * * * * * * * * */
 NeuronIIcNode::NeuronIIcNode() : Node("neuron_gpio")
 {
-    //==== IMU msg is currently unavailable under ROS2 ====//
-    /*publisher_ = this->create_publisher<sensor_msgs::msg::Imu>(
-            TOPIC_DATA, rmw_qos_profile_sensor_data);*/
-    
-    publisher_ = this->create_publisher<std_msgs::msg::String>(
-            TOPIC_DATA, rmw_qos_profile_sensor_data);
 
+    publisher_imu_ = this->create_publisher<sensor_msgs::msg::Imu>(
+            "imu", rmw_qos_profile_sensor_data);
+    publisher_tmp_ = this->create_publisher<sensor_msgs::msg::Temperature>(
+            "imu_temp", rmw_qos_profile_sensor_data);
     subscription_ = this->create_subscription<std_msgs::msg::String>(
             TOPIC_CMD, std::bind(&NeuronIIcNode::topic_callback, this, _1),
             rmw_qos_profile_sensor_data);
         
     NeuronIIc::InitLib();
-    
     gpio_ = NeuronIIc::IsAvailable()? std::make_shared<NeuronIIc>(GPIO_TOGGLE_PIN) : NULL;
+    
+    imu_msg_ = std::make_shared<sensor_msgs::msg::Imu>();
+    imu_msg_ -> header.frame_id = "imu";
+    
+    tmp_msg_ = std::make_shared<sensor_msgs::msg::Temperature>();
+    tmp_msg_ -> header.frame_id = "imu";
 }
 
 NeuronIIcNode::~NeuronIIcNode()

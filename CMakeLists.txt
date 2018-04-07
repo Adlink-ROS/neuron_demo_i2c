@@ -29,11 +29,12 @@ endif(UNIX)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 # Source Code
 add_executable(neuron_demo_i2c src/main.cpp src/neuronIIc.cpp src/neuronIIcNode.cpp)
 target_link_libraries(neuron_demo_i2c semaeapi)
-ament_target_dependencies(neuron_demo_i2c rclcpp std_msgs)
+ament_target_dependencies(neuron_demo_i2c rclcpp std_msgs, sensor_msgs)
 
 install(TARGETS 
 neuron_demo_i2c
