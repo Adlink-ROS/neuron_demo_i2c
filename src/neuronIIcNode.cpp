@@ -32,9 +32,11 @@
         return;
     }
 	
-	uint8_t data[14];
+	// For MPU 6050 registers, see:
+	// https://www.i2cdevlib.com/devices/mpu6050#registers
+	std::vector<uint8_t> data(14);
     gpio_->WakeUp6050();
-	gpio_->ReadI2C(data, 14);
+	gpio_->ReadI2C(0x3B, data, 14);
     
 	int16_t ac_x = data[0]<<8|data[1];
 	int16_t ac_y = data[2]<<8|data[3];

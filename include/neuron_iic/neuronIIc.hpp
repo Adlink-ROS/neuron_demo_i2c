@@ -1,5 +1,5 @@
-// Copyright 2017 ADLINK Technology, Inc.
-// Developer: Alan Chen (alan.chen@adlinktech.com)
+// Copyright 2018 ADLINK Technology, Inc.
+// Developer: Ewing Kang (f039281310@yahoo.com.tw)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #define __NEURON_GPIO__
 
 #include <string>
+#include <vector>
 #include "linux/EApiOs.h"
 #include "EApi.h"
 #include "semaeapi.h"
@@ -28,20 +29,22 @@ class NeuronIIc
         static void InitLib();
         static void UnInitLib();
 
-		void SetDir(uint32_t dir);
-		void SetLevel(uint32_t level);
-		void ReadLevel(uint32_t& level);
-		void ReadI2C(uint8_t *data_ptr, unsigned int bfr_size);
+		//void SetDir(uint32_t dir);
+		//void SetLevel(uint32_t level);
+		//void ReadLevel(uint32_t& level);
+
+		void ReadI2C(const uint8_t cmd, std::vector<uint8_t> &data),const uint32_t byte_cnt);
+		void WriteI2C(const uint8_t cmd, const std::vector<uint8_t> &data), const uint32_t byte_cnt);
         void WakeUp6050();
 
-        explicit NeuronIIc(uint32_t pin) : pin_(pin) {};
+        explicit NeuronIIc(uint8_t addr) : addr_(EAPI_I2C_ENC_7BIT_ADDR(addr)) {};
         virtual ~NeuronIIc() {};
 
     private:
         static bool isAvailable_;
-        static uint32_t libHandle_;        
-		uint32_t pin_;
-        static bool first_time;
+        static uint32_t libHandle_;
+        static bool first_time_;
+		const uint8_t addr_;
 };
 
 

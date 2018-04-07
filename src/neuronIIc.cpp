@@ -1,5 +1,5 @@
-// Copyright 2017 ADLINK Technology, Inc.
-// Developer: Alan Chen (alan.chen@adlinktech.com)
+// Copyright 2018 ADLINK Technology, Inc.
+// Developer: Ewing Kang (f039281310@yahoo.com.tw)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <stdio.h>
+#include <vector>
 #include "neuronIIc.hpp"
 
 /* * * * * * * * * * * * * *  
@@ -23,7 +24,7 @@ bool NeuronIIc::isAvailable_ = false;
 
 uint32_t NeuronIIc::libHandle_ = 0;
 
-bool NeuronIIc::first_time = true;
+bool NeuronIIc::first_time_ = true;
 
 /* * * * * * * * * * * * * 
  * Static Public Methods *
@@ -40,9 +41,9 @@ void NeuronIIc::InitLib()
     if (isAvailable_ == false)
     {
         uint32_t ret = 0;
-        char addr[16] = "127.0.0.1";
+        char addr_[16] = "127.0.0.1";
 
-        ret = SemaEApiLibInitialize(false, IP_V4, addr, 0, (char *)"123", &libHandle_);
+        ret = SemaEApiLibInitialize(false, IP_V4, addr_, 0, (char *)"123", &libHandle_);
         isAvailable_ = (ret == EAPI_STATUS_SUCCESS)?  true : false;
         if (isAvailable_ == false)
         {
@@ -67,6 +68,7 @@ void NeuronIIc::UnInitLib()
 /* * * * * * * * * * * * * 
  *    Public Methods     *
  * * * * * * * * * * * * */
+ /*
 void NeuronIIc::SetDir(uint32_t dir)
 {
     uint32_t dirCheck = 0, ret = 0;
@@ -107,51 +109,66 @@ void NeuronIIc::ReadLevel(uint32_t& level)
     {
         printf("Error getting GPIO level: 0x%X\n\n", ret);
     }
-}
+}*/
 
 
-void NeuronIIc::ReadI2C(uint8_t *data_ptr, unsigned int bfr_size)
+void NeuronIIc::ReadI2C(const uint8_t cmd, std::vector<uint8_t> &data),const uint32_t byte_cnt)
 {
-	// For MPU 6050
-	// https://www.i2cdevlib.com/devices/mpu6050#registers
-	uint32_t ret = 0;
-	uint8_t addr = EAPI_I2C_ENC_7BIT_ADDR(0x68);
-	/*if( sizeof(data_ptr) != bfr_size) {
-		printf("Error data size not match");
+	uint32_t data_size = data.size() * sizeof(uint8_t);
+	if(byte_cnt > data_size)
+	{
+		printf("Error reading %d bytes of data with only %d bytes of space", 
+															byte_cnt, data_size);
 		return;
-	}*/
+	}
+	uint32_t ret = 0;
     ret = SemaEApiI2CReadTransfer(libHandle_, 
                                   EAPI_ID_I2C_EXTERNAL, 
-                                  addr,
-                                  0x3B , 		// I2C Command/Offset, starting with register 0x3B (ACCEL_XOUT_H)
-                                  data_ptr , 		// void *pBuffer, Transfer Data pBuffer
-								  bfr_size, // uint32_t	BufLen, Data pBuffer Length
-								  7*2);			// uint32_t	ByteCnt, Byte Count to read
+                                  addr_,
+                                  cmd , 		// I2C Command/Offset, starting with register 0x3B (ACCEL_XOUT_H)
+                                  &data[0] , 		// void *pBuffer, Transfer Data pBuffer
+								  data_size, 		// uint32_t, Data pBuffer Length
+								  byte_cnt);			// uint32_t	ByteCnt, Byte Count to read
 	if (ret != EAPI_STATUS_SUCCESS) 
     {
         printf("Error Reading IIc: 0x%X\n\n", ret);
     }
 }
 
+
+void NeuronIIc::WriteI2C(const uint8_t &cmd, const std::vector<uint8_t> &data), const uint32_t byte_cnt)
+{
+	uint32_t data_size = data.size() * sizeof(uint8_t);
+	if(byte_cnt > data_size)
+	{
+		printf("Error writing %d bytes of data, only %d bytes is given", 
+														byte_cnt, data_size);
+		return;
+	}
+	
+	uint32_t ret = 0;
+	ret = SemaEApiI2CWriteTransfer(libHandle_,
+								   EAPI_ID_I2C_EXTERNAL,
+								   addr_,
+								   cmd,
+								   &data[0],
+								   byte_cnt);
+	if (ret != EAPI_STATUS_SUCCESS) 
+	{
+        printf("Error Writing IIc: 0x%X\n\n", ret);
+    }
+	
+}
+
+
 void NeuronIIc::WakeUp6050()
 {
-    uint8_t addr = EAPI_I2C_ENC_7BIT_ADDR(0x68);
-    uint8_t cmd = 0x00; // |reset|sleep|cycle|RSV|temp_dis|clk_sel*2|
-    if(first_time){
-        /*SemaEApiI2CWriteTransfer(libHandle_,
-                                 EAPI_ID_I2C_EXTERNAL,
-                                 addr,
-                                 0x6B,
-                                 &cmd,
-                                 1);*/
+    //uint8_t cmd = 0x00; // |reset|sleep|cycle|RSV|temp_dis|clk_sel*2|
+    if(first_time_)
+	{
+   
     }
-    SemaEApiI2CWriteTransfer(libHandle_,
-                             EAPI_ID_I2C_EXTERNAL,
-                             addr,
-                             0x6B,
-                             &cmd,
-                             1);
-    
-    first_time = false;
+	WriteI2C(0x6B, std::vector<uint8_t>(0x00), 1)
+    first_time_ = false;
     return;
 }
