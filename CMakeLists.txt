@@ -14,7 +14,7 @@ endif()
 #set(CMAKE_BUILD_TYPE Debug)
 
 # Add include directories
-include_directories(${CMAKE_SOURCE_DIR}/include/neuron_demo_iic ${CMAKE_SOURCE_DIR}/include/SEMA)
+include_directories(${CMAKE_SOURCE_DIR}/include/neuron_iic ${CMAKE_SOURCE_DIR}/include/SEMA)
 
 # Set link directories
 link_directories(${CMAKE_SOURCE_DIR}/lib)
